@@ -18,7 +18,7 @@ Or install it yourself as:
 
 ## Usage
 
-require 'nmatrix_extras'
+		require 'nmatrix_extras'
 
 This will add the extra methods to the NMatrix class.
 
