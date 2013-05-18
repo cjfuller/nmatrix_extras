@@ -135,6 +135,15 @@ module NMatrixExtras
   end
 
   ##
+  # Calculates the sample standard deviation along the specified dimension.
+  #
+  # @see #reduce_along_dim
+  #
+  def std(dim=0)
+    variance(dim).map! { |e| Math.sqrt(e) }
+  end
+
+  ##
   # Converts an nmatrix with a single element (but any number of dimensions) to a float.
   #
   # Raises an IndexError if the matrix does not have just a single element.
@@ -161,6 +170,7 @@ module NMatrixExtras
     self.each_stored_with_indices do |e, *i|
       self[*i] = (yield e)
     end
+    self
   end
 
 end

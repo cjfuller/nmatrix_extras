@@ -75,7 +75,8 @@ describe NMatrix do
   end
 
   it "should calculate the standard deviation along the specified dimension" do
-    pending 
+    @nm_1d.std.should eq N[Math.sqrt(3.7)]
+    @nm_2d.std(1).should eq N[[Math.sqrt(0.5)], [Math.sqrt(0.5)]]
   end
 
   it "should calculate the correlation coefficient with another same-sized nmatrix" do
