@@ -33,13 +33,20 @@ describe NMatrix do
   context "_like constructors" do
 
     it "should create an nmatrix of ones with dimensions and type the same as its argument" do
-      pending
+      NMatrix.ones_like(@nm_1d).should eq N[1.0, 1.0, 1.0, 1.0, 1.0]
+      NMatrix.ones_like(@nm_2d).should eq N[[1.0, 1.0], [1.0, 1.0]]
     end
 
     it "should create an nmatrix of zeros with dimensions and type the same as its argument" do 
-      pending
+      NMatrix.zeros_like(@nm_1d).should eq N[0.0, 0.0, 0.0, 0.0, 0.0]
+      NMatrix.zeros_like(@nm_2d).should eq N[[0.0, 0.0], [0.0, 0.0]]
     end
 
+  end
+
+  it "behaves like Enumerable#reduce with no argument to reduce" do
+    @nm_1d.reduce_along_dim(0) { |acc, el| acc + el }.to_f.should eq 11
+    @nm_2d.reduce_along_dim(1) { |acc, el| acc + el }.should eq N[[1, 5]]
   end
 
   it "should calculate the mean along the specified dimension" do
@@ -51,17 +58,11 @@ describe NMatrix do
     @nm_1d.min.should eq N[0.0]
     @nm_2d.min.should eq N[[0.0, 1.0]]
     @nm_2d.min(1).should eq N[[0.0], [2.0]]
-
   end
 
   it "should calculate the maximum along the specified dimension" do
     @nm_1d.max.should eq N[5.0]
     @nm_2d.max.should eq N[[2.0, 3.0]]
-  end
-
-  it "should calculate the median along the specified dimension" do
-    @nm_1d.median.should eq N[2.0]
-    @nm_2d.median(1).should eq N[[0.5], [2.5]]
   end
 
   it "should calculate the variance along the specified dimension" do
@@ -79,16 +80,8 @@ describe NMatrix do
     @nm_2d.std(1).should eq N[[Math.sqrt(0.5)], [Math.sqrt(0.5)]]
   end
 
-  it "should calculate the correlation coefficient with another same-sized nmatrix" do
-    pending
-  end
-
-  it "should calculate the covariance with another same-sized nmatrix" do 
-    pending
-  end
-
   it "should raise an ArgumentError when any invalid dimension is provided" do 
-    pending
+    expect { @nm_1d.mean(3) }.to raise_exception(ArgumentError)
   end
 
   it "should convert to float if it contains only a single element" do 

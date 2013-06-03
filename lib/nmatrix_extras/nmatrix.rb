@@ -24,6 +24,10 @@ require 'nmatrix'
 
 module NMatrixExtras
 
+  def self.included(base)
+    base.extend(ClassMethods)
+  end
+
   ##
   # Successively yields submatrices at each coordinate along a specified dimension.  Each submatrix will have the same number of dimensions as the matrix being iterated,
   # but with the specified dimension's size equal to 1.
@@ -43,12 +47,12 @@ module NMatrixExtras
   # Reduces an NMatrix using a supplied block over a specified dimension.  The block should behave the same way as for Enumerable#reduce.
   #
   # @param [Integer] dim the dimension being reduced
-  # @param [Numeric] initial the initial value for the reduction (i.e. the usual parameter to Enumerable#reduce).  Note that unlike Enumerable#reduce, if not specified, this will default to 0.0.
-  #
+  # @param [Numeric] initial the initial value for the reduction (i.e. the usual parameter to Enumerable#reduce).  Supply nil or do not supply
+  #  this argument to have it follow the usual Enumerable#reduce behavior of using the first element as the initial value.
   # @return [NMatrix] an NMatrix with the same number of dimensions as the input, but with the input dimension now having size 1.  
   #    Each element is the result of the reduction at that position along the specified dimension.
   #
-  def reduce_along_dim(dim=0, initial=0.0, &bl)
+  def reduce_along_dim(dim=0, initial=nil, &bl)
 
     if dim > shape.size then
       raise ArgumentError, "Requested dimension does not exist.  Requested: #{dim}, shape: #{shape}"
@@ -57,15 +61,31 @@ module NMatrixExtras
     new_shape = shape
     new_shape[dim] = 1
 
-    acc = NMatrix.new(new_shape, initial)
+    first_as_acc = false
+
+    if initial then
+      acc = NMatrix.new(new_shape, initial)
+    else
+      each_along_dim(dim) do |sub_mat|
+        acc = sub_mat
+        break
+      end
+      first_as_acc = true
+    end
 
     each_along_dim(dim) do |sub_mat|
+      if first_as_acc then
+        first_as_acc = false
+        next
+      end
       acc = bl.call(acc, sub_mat)
     end
 
     acc
 
   end
+
+  alias_method :inject_along_dim, :reduce_along_dim
 
   ##
   # Calculates the mean along the specified dimension.
@@ -111,16 +131,6 @@ module NMatrixExtras
     end
   end
 
-  ##
-  # Calculates the median along the specified dimension.
-  #
-  # Not yet implemented.
-  #
-  # @see #reduce_along_dim
-  #
-  def median(dim=0)
-    raise NotImplementedError, "median not yet implemented"
-  end
 
   ##
   # Calculates the sample variance along the specified dimension.
@@ -171,6 +181,18 @@ module NMatrixExtras
       self[*i] = (yield e)
     end
     self
+  end
+
+  module ClassMethods
+
+    def ones_like(nm)
+      NMatrix.ones(nm.shape, nm.dtype)
+    end
+
+    def zeros_like(nm)
+      NMatrix.zeros(nm.stype, nm.shape, nm.dtype)
+    end
+
   end
 
 end

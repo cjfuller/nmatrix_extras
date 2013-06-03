@@ -24,6 +24,5 @@ require "nmatrix_extras/version"
 require "nmatrix_extras/nmatrix"
 
 class NMatrix
-	include Enumerable
 	include NMatrixExtras
 end
